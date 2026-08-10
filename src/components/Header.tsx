@@ -26,12 +26,31 @@ export default function Header({
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "G";
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isA11ySettingsOpen, setIsA11ySettingsOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const handleAccountClick = async () => {
-    if (!user) return; // Guest — nothing to sign out of.
+  const handleSignOut = async () => {
+    setIsProfileMenuOpen(false);
     await signOut();
     navigate("/");
   };
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!profileMenuRef.current?.contains(event.target as Node)) setIsProfileMenuOpen(false);
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsProfileMenuOpen(false);
+    }
+    window.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isProfileMenuOpen]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -175,17 +194,66 @@ export default function Header({
           </button>
 
           {/* Profile */}
-          <button
-            type="button"
-            onClick={handleAccountClick}
-            aria-label={user ? "Sign out" : "Guest — not signed in"}
-            title={user ? `Signed in as ${user.email} — click to sign out` : "Guest — not signed in"}
-            className="flex items-center rounded-full px-2 py-1 hover:bg-bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-600 text-sm font-semibold text-white">
-              {initials}
-            </div>
-          </button>
+          <div ref={profileMenuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+              aria-haspopup="true"
+              aria-expanded={isProfileMenuOpen}
+              aria-label={user ? `Account menu — signed in as ${user.email}` : "Account menu — browsing as guest"}
+              title={user ? `Signed in as ${user.email}` : "Browsing as guest"}
+              className="flex items-center rounded-full px-2 py-1 hover:bg-bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-600 text-sm font-semibold text-white">
+                {initials}
+              </div>
+            </button>
+
+            {isProfileMenuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full mt-2 w-56 rounded-md border border-border bg-surface py-1 shadow-lg"
+              >
+                {user ? (
+                  <>
+                    <p className="truncate px-3 py-2 text-sm text-text-secondary">
+                      Signed in as <span className="font-medium text-text-primary">{user.email}</span>
+                    </p>
+                    <div className="my-1 border-t border-border-subtle" />
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleSignOut}
+                      className="block w-full px-3 py-2 text-left text-sm text-text-primary transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="px-3 py-2 text-sm text-text-secondary">Browsing as guest</p>
+                    <div className="my-1 border-t border-border-subtle" />
+                    <Link
+                      to="/signin"
+                      role="menuitem"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="block px-3 py-2 text-sm text-text-primary transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      to="/signup"
+                      role="menuitem"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="block px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
