@@ -69,7 +69,7 @@ Two [differentiators](spec/differentiators.md) are implemented: **Accessibility-
 | Search                     | ✅ Done — client-side, highlights matches, composes with category selection; date-range filter and search history not built (MVP scope — see Known Limitations)                                                                                                                   |
 | OPML Import/Export         | ✅ Done — import with a duplicate-flagged preview and results summary, export preserving category structure; handles `data/sample-feeds.opml`'s edge cases (nested categories, missing `type`, lowercase `xmlurl`/`htmlurl`)                                                      |
 | Refresh and Polling        | ✅ Done — configurable auto-refresh interval (15/30/60 min or manual), a "last updated" timestamp, and a dismissible "N new items" banner distinct from the existing "since last visit" one; ETag/Last-Modified conditional caching not built (MVP scope — see Known Limitations) |
-| Performance                | 🟡 MVP pass — lazy-loaded images (cards and reader content), skeleton loading screens (no layout shift), route-level code-splitting (`Analytics`/`Accessibility`/`Reset Password` are separate chunks); no formal Lighthouse run (see Known Limitations)                          |
+| Performance                | ✅ Done — lazy-loaded images, skeleton loading screens (no layout shift), route-level code-splitting; Lighthouse 82/83/100/82 (landing) — see [Design Decisions](#design-decisions) for the full scores and the `/app` caveat |
 | Keyboard Navigation        | ✅ Done — `j`/`k` to move focus, `o`/`Enter` to open, `s` to save, `m` to toggle read, `/` to search, `?` for a shortcut reference, `Cmd/Ctrl+K` command palette; vim-style `g`-then-key sequences not built (MVP scope — see Known Limitations)                                  |
 
 ### Differentiators
@@ -153,9 +153,18 @@ These are the product and design choices made where the spec left room for inter
 
 ### Performance
 
-**The approach:** Concrete, verifiable changes rather than a formal score: `loading="lazy"` on every card/avatar image and on reader-view content images (via a DOMPurify hook that tags every sanitized `<img>`); a skeleton-screen component matching each layout's real shape for the very first load (no layout shift, unlike the old plain "Loading…" text); and `React.lazy`/`Suspense` code-splitting for the three less-visited routes (Analytics, Accessibility statement, Reset password), confirmed via `npm run build` to produce separate chunks.
+**The approach:** Concrete, verifiable changes: `loading="lazy"` on every card/avatar image and on reader-view content images (via a DOMPurify hook that tags every sanitized `<img>`); a skeleton-screen component matching each layout's real shape for the very first load (no layout shift, unlike the old plain "Loading…" text); and `React.lazy`/`Suspense` code-splitting for the three less-visited routes (Analytics, Accessibility statement, Reset password), confirmed via `npm run build` to produce separate chunks.
 
-**Why no Lighthouse run:** There's no reliable way to run a full Lighthouse audit in this environment — documenting that honestly rather than fabricating a score.
+**Lighthouse scores** (`npx lighthouse`, headless, against a `vite preview` production build):
+
+| Route | Performance | Accessibility | Best Practices | SEO |
+|-------|:-----------:|:--------------:|:---------------:|:---:|
+| `/` (landing) | 82 | 83 | 100 | 82 |
+| `/app` (dashboard, guest) | 59 | 96 | 100 | 82 |
+
+Landing page: FCP/LCP 2.5s, TBT 470ms, CLS 0, TTI 3.0s — under the spec's 3s initial-load target but over its 2s landing-page-TTI target.
+
+**Why `/app`'s performance score is lower, and why it's not fully representative:** `vite preview` serves the built static files only — it doesn't run the dev-only middleware that mirrors `/api/*` locally (see Tech Stack), so under this specific test the dashboard's feed requests 404 and the page never reaches its real steady state. The 59 is a real number for *this* test setup, not a claim about production performance under Vercel (where `/api/*` runs for real); it's reported here rather than omitted because a caveated real number is more honest than no number at all.
 
 ### Keyboard Navigation
 
@@ -183,7 +192,7 @@ These are the product and design choices made where the spec left room for inter
 - **Search has no date-range filter or recent-search history.** Both are explicitly optional in the spec; not built.
 - **Refresh has no conditional (ETag/Last-Modified) caching.** Auto-refresh and the "new items" banner work; feeds are always re-fetched in full rather than skipped when unchanged upstream.
 - **Keyboard navigation has no vim-style `g`-then-key sequences.** The single-key shortcuts and command palette cover the same destinations.
-- **No formal Lighthouse/performance score recorded** — see [Design Decisions](#design-decisions) for the concrete optimizations that were made instead.
+- **The `/app` Lighthouse score reflects a `vite preview` build without `/api/*` running**, not real production performance — see [Design Decisions](#design-decisions) for why.
 - **AI Summarization and Offline/PWA support (differentiators) were not chosen** for this pass — see the Differentiators table above.
 - **Feed-fetch SSRF hardening is basic.** `/api/feed` and `/api/validateFeed` accept arbitrary user-supplied URLs (a structural requirement of "add any feed by URL") and block the obvious cases — localhost, private IP ranges — by hostname text. They do not resolve DNS or guard against rebinding attacks; that level of hardening was judged out of scope for this project.
 - **No rate limiting** on feed fetches beyond the per-feed backoff on repeated failures.
