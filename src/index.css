@@ -62,3 +62,216 @@
   --container-feed: 60rem;
   --container-page: 80rem;
 }
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0.5rem;
+  z-index: 100;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* Reader view content: renders sanitized feed HTML (headings, paragraphs,
+   lists, code blocks, images) with the brand kit's serif reading treatment.
+   Tailwind's preflight strips default margins, so these rules restore
+   sensible rhythm for content we don't control the markup of. */
+.reader-content {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+  color: var(--color-text-primary);
+  overflow-wrap: break-word;
+}
+
+.reader-content > * + * {
+  margin-top: var(--space-4);
+}
+
+.reader-content h1,
+.reader-content h2,
+.reader-content h3,
+.reader-content h4 {
+  font-family: var(--font-sans);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  margin-top: var(--space-8);
+}
+
+.reader-content h1 {
+  font-size: var(--text-xl);
+}
+.reader-content h2 {
+  font-size: var(--text-lg);
+}
+.reader-content h3,
+.reader-content h4 {
+  font-size: var(--text-base);
+}
+
+.reader-content ul,
+.reader-content ol {
+  padding-left: var(--space-6);
+}
+.reader-content ul {
+  list-style: disc;
+}
+.reader-content ol {
+  list-style: decimal;
+}
+.reader-content li + li {
+  margin-top: var(--space-2);
+}
+
+.reader-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.reader-content img,
+.reader-content video {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.reader-content pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  overflow-x: auto;
+}
+
+.reader-content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+  padding: 0.15em 0.4em;
+}
+
+.reader-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.reader-content blockquote {
+  border-left: 3px solid var(--color-border);
+  padding-left: var(--space-4);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Accessibility-First Reading differentiator. These read data-* attributes
+   set on <html> by AccessibilityProvider (src/contexts/AccessibilityProvider.tsx),
+   applied globally so they affect every page, not just the dashboard. */
+
+/* Explicit in-app override, in addition to the prefers-reduced-motion media
+   query above — lets a user force reduced motion on even when their OS
+   reports no preference (and vice versa is unnecessary: OS preference
+   already wins by default via that media query). */
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* High contrast: WCAG AAA targets pure black/white text (21:1) against the
+   existing backgrounds, with borders strong enough to read without relying
+   on the subtler default palette. Placed after tokens.css's :root block, so
+   equal-specificity attribute selector wins on source order. */
+[data-contrast="high"] {
+  --color-text-primary: #000000;
+  --color-text-secondary: #000000;
+  --color-text-tertiary: #1a1a1a;
+  --color-border: #000000;
+  --color-border-subtle: #333333;
+  --color-accent: #0000cc;
+  --color-accent-hover: #000099;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-contrast="high"] {
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #ffffff;
+    --color-text-tertiary: #eeeeee;
+    --color-border: #ffffff;
+    --color-border-subtle: #cccccc;
+    --color-accent: #99ccff;
+    --color-accent-hover: #cce6ff;
+  }
+}
+
+/* Dyslexia-friendly font: Lexend (see index.html for the Google Fonts
+   import) applied app-wide, and specifically over the reader's serif
+   treatment since that's the primary "reading" surface. */
+[data-dyslexia-font="true"] {
+  font-family: "Lexend", var(--font-sans);
+}
+[data-dyslexia-font="true"] .reader-content {
+  font-family: "Lexend", var(--font-sans);
+}
+
+[data-line-height="relaxed"] .reader-content {
+  line-height: 1.75;
+}
+[data-line-height="loose"] .reader-content {
+  line-height: 2;
+}
+
+/* .reader-panel is the reader's outer dialog (the element that actually
+   carries the max-w-content cap) — .reader-content itself has no width of
+   its own, so overriding it directly wouldn't do anything wider than the
+   panel already allows. */
+[data-line-length="narrow"] .reader-panel {
+  max-width: 32rem;
+}
+[data-line-length="wide"] .reader-panel {
+  max-width: 60rem;
+}
+
+/* Add Feed's slide-in side panel (guidance/patterns.md: don't use a heavy
+   centered modal for a routine action) — respects prefers-reduced-motion via
+   the existing [data-reduced-motion="true"] rule above, which zeroes out
+   every animation-duration app-wide. */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.panel-slide-in {
+  animation: slide-in-right 200ms ease-out;
+}

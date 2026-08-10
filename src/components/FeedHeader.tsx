@@ -1,39 +1,98 @@
 import { RxTextAlignLeft } from "react-icons/rx";
 import { BiRefresh } from "react-icons/bi";
 import IconButtons from "./IconButtons";
-import { ArrowUp } from "lucide-react";
+import type { FeedLayout } from "../hooks/useLayoutPreference";
+import type { AutoRefreshInterval } from "../hooks/useAutoRefreshInterval";
+import { VALID_AUTO_REFRESH_INTERVALS } from "../hooks/useAutoRefreshInterval";
 
-function FeedHeader() {
+const INTERVAL_LABELS: Record<AutoRefreshInterval, string> = {
+  off: "Manual only",
+  "15m": "Every 15 min",
+  "30m": "Every 30 min",
+  "1h": "Every hour",
+};
+
+type FeedHeaderProps = {
+  selectedCategory: string;
+  unreadCount: number;
+  onRefresh: () => void;
+  onMarkAllRead: () => void;
+  layout: FeedLayout;
+  onLayoutChange: (layout: FeedLayout) => void;
+  autoRefreshInterval: AutoRefreshInterval;
+  onAutoRefreshChange: (interval: AutoRefreshInterval) => void;
+  lastUpdatedLabel: string | null;
+};
+
+function FeedHeader({
+  selectedCategory,
+  unreadCount,
+  onRefresh,
+  onMarkAllRead,
+  layout,
+  onLayoutChange,
+  autoRefreshInterval,
+  onAutoRefreshChange,
+  lastUpdatedLabel,
+}: FeedHeaderProps) {
   return (
-    <div>
-      <div className="flex justify-between items-center px-6 py-4 border-b border-gray-300">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold">All Items</h1>
-          <h2 className="text-sm text-gray-600 font-light"> 47 unread</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <IconButtons />
-
-          <button className="flex items-center gap-1 rounded-md border border-gray-400 text-gray-900 px-3 py-1 hover:bg-gray-100">
-            <span className="relative -top-1">
-              <RxTextAlignLeft className="h-4 w-4" />
-            </span>
-            <span className="font-medium">Newest</span>
-          </button>
-          <button className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1 hover:bg-gray-100 font-medium">
-            <BiRefresh />
-            Refresh
-          </button>
-          <button className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1 hover:bg-gray-100 font-medium">
-            Mark all read
-          </button>
-        </div>
+    <div className="flex flex-wrap gap-3 justify-between items-center px-4 sm:px-6 py-4 border-b border-border">
+      <div className="flex items-center gap-2">
+        <h1 className="text-lg font-semibold">
+          {selectedCategory === "All" ? "All Items" : selectedCategory}
+        </h1>
+        <h2 className="text-sm text-text-secondary font-light">
+          {unreadCount} unread
+        </h2>
+        {lastUpdatedLabel && (
+          <span className="hidden text-xs text-text-tertiary sm:inline">· Updated {lastUpdatedLabel}</span>
+        )}
       </div>
-      <div className="bg-blue-100 items-center justify-center flex gap-2 px-6 py-2 border-b border-gray-300">
-        <ArrowUp className="h-5 w-5 text-blue-500" />
-        <p className="text-md text-blue-500 font-semibold">
-          5 new items since your last visit
-        </p>
+      <div className="flex flex-wrap items-center gap-2">
+        <IconButtons layout={layout} onLayoutChange={onLayoutChange} />
+
+        <button
+          type="button"
+          className="hidden sm:flex items-center gap-1 rounded-md border border-border text-text-primary px-3 py-1.5 font-semibold transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          <span className="relative -top-1">
+            <RxTextAlignLeft className="h-4 w-4" />
+          </span>
+          <span>Newest</span>
+        </button>
+
+        <label htmlFor="auto-refresh-interval" className="sr-only">
+          Auto-refresh interval
+        </label>
+        <select
+          id="auto-refresh-interval"
+          value={autoRefreshInterval}
+          onChange={(event) => onAutoRefreshChange(event.target.value as AutoRefreshInterval)}
+          className="rounded-md border border-border bg-bg-primary px-2 py-1.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {VALID_AUTO_REFRESH_INTERVALS.map((interval) => (
+            <option key={interval} value={interval}>
+              {INTERVAL_LABELS[interval]}
+            </option>
+          ))}
+        </select>
+
+        <button
+          type="button"
+          onClick={onRefresh}
+          aria-label="Refresh feeds"
+          className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 font-semibold transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          <BiRefresh />
+          <span className="hidden sm:inline">Refresh</span>
+        </button>
+        <button
+          type="button"
+          onClick={onMarkAllRead}
+          className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 font-semibold transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          Mark all as read
+        </button>
       </div>
     </div>
   );
