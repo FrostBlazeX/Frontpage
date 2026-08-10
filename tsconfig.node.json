@@ -6,8 +6,13 @@
     "types": ["node"],
     "skipLibCheck": true,
 
-    /* Bundler mode */
-    "module": "nodenext",
+    /* Bundler mode — vite.config.ts is loaded via Vite's own esbuild-based
+       config loader, not raw Node ESM, so this matches tsconfig.app.json's
+       resolution semantics rather than requiring nodenext's .js-extension
+       convention (which broke once this file started importing the
+       api/-adjacent plugin code — see tsconfig.api.json). */
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",

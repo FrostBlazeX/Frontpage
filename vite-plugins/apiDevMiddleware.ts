@@ -1,6 +1,6 @@
 import type { Plugin } from "vite";
-import feedHandler, { type MinimalApiRequest, type MinimalApiResponse } from "../api/feed.ts";
-import validateFeedHandler from "../api/validateFeed.ts";
+import feedHandler, { type MinimalApiRequest, type MinimalApiResponse } from "../api/feed";
+import validateFeedHandler from "../api/validateFeed";
 
 type ApiHandler = (req: MinimalApiRequest, res: MinimalApiResponse) => Promise<void>;
 

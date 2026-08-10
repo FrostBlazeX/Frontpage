@@ -1,5 +1,5 @@
-import { BLOG_FEEDS } from "../src/data/blogs.ts";
-import { fetchAndParseFeed, isFetchableFeedUrl } from "./_lib/fetchFeed.ts";
+import { BLOG_FEEDS } from "../src/data/blogs";
+import { fetchAndParseFeed, isFetchableFeedUrl } from "./_lib/fetchFeed";
 
 export interface MinimalApiRequest {
   query: Record<string, string | string[] | undefined>;
