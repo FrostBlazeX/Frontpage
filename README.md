@@ -19,18 +19,18 @@ Two [differentiators](spec/differentiators.md) are implemented: **Accessibility-
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 19 + TypeScript, built with Vite |
-| Routing | `react-router-dom` v7 (`BrowserRouter`) |
-| Backend | [Supabase](https://supabase.com) — Postgres + Auth, accessed via `@supabase/supabase-js` with the public `anon` key; every table is protected by row-level security (`auth.uid() = user_id`), which is the actual security boundary for a client-side app using a public key |
-| Feed fetching | Vercel-style serverless functions (`api/*.ts`), mirrored locally by a custom Vite dev middleware (`vite-plugins/apiDevMiddleware.ts`) — no Vercel CLI needed for local dev |
-| Feed parsing | `rss-parser`, with custom charset detection (`iconv-lite`) and HTML sanitization (`dompurify`) |
-| Persistence | Guest mode: `localStorage`. Signed-in: Supabase tables (`categories`, `custom_feeds`, `hidden_feeds`, `feed_title_overrides`, `read_events`, `bookmarks`, `preferences`) — see `supabase/migrations/` |
-| Styling | Tailwind CSS v4, driven by the brand kit's CSS custom properties (`starter/tokens.css`) |
-| Fonts | Inter (default UI), Lexend (optional dyslexia-friendly mode — see Accessibility-First Reading) |
-| Icons | `lucide-react` (primary), `react-icons` (a couple of header icons) |
-| Hosting | Any static host with serverless function support (Vercel, Netlify, etc.) — not yet deployed |
+| Layer         | Technology                                                                                                                                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework     | React 19 + TypeScript, built with Vite                                                                                                                                                                                                                                       |
+| Routing       | `react-router-dom` v7 (`BrowserRouter`)                                                                                                                                                                                                                                      |
+| Backend       | [Supabase](https://supabase.com) — Postgres + Auth, accessed via `@supabase/supabase-js` with the public `anon` key; every table is protected by row-level security (`auth.uid() = user_id`), which is the actual security boundary for a client-side app using a public key |
+| Feed fetching | Vercel-style serverless functions (`api/*.ts`), mirrored locally by a custom Vite dev middleware (`vite-plugins/apiDevMiddleware.ts`) — no Vercel CLI needed for local dev                                                                                                   |
+| Feed parsing  | `rss-parser`, with custom charset detection (`iconv-lite`) and HTML sanitization (`dompurify`)                                                                                                                                                                               |
+| Persistence   | Guest mode: `localStorage`. Signed-in: Supabase tables (`categories`, `custom_feeds`, `hidden_feeds`, `feed_title_overrides`, `read_events`, `bookmarks`, `preferences`) — see `supabase/migrations/`                                                                        |
+| Styling       | Tailwind CSS v4, driven by the brand kit's CSS custom properties (`starter/tokens.css`)                                                                                                                                                                                      |
+| Fonts         | Inter (default UI), Lexend (optional dyslexia-friendly mode — see Accessibility-First Reading)                                                                                                                                                                               |
+| Icons         | `lucide-react` (primary), `react-icons` (a couple of header icons)                                                                                                                                                                                                           |
+| Hosting       | Any static host with serverless function support (Vercel, Netlify, etc.) — not yet deployed                                                                                                                                                                                  |
 
 ---
 
@@ -38,50 +38,50 @@ Two [differentiators](spec/differentiators.md) are implemented: **Accessibility-
 
 ### Core Requirements
 
-| # | Feature | Status |
-|---|---------|--------|
-| 1 | Feed Management (add/edit/remove, validate, favicon, health) | ✅ Done |
-| 2 | Feed Parsing (RSS 2.0, Atom, RSS 1.0/RDF, encodings, malformed XML) | ✅ Done |
-| 3 | Content Browsing (list, favicons, sort, filter, pagination) | ✅ Done |
-| 4 | Category Organization (create/rename/delete/reorder, Uncategorized, unread counts) | ✅ Done |
-| 5 | Read/Unread Tracking (manual toggle, mark-all at every scope, persistence) | ✅ Done |
-| 6 | Article View (reader view, sanitized HTML, next/prev, original link) | ✅ Done |
-| 7 | Responsive Design (mobile nav drawer, no horizontal scroll) | ✅ Done |
-| 8 | Feed Error Handling (temporary vs. dead, backoff, manual retry) | ✅ Done |
-| 9 | User Authentication | ✅ Done — Supabase email/password sign-up, sign-in, sign-out, password reset |
-| 10 | Landing Page | ✅ Done — hero, feature highlights, dual CTAs (`/`) |
-| 11 | "Try as Guest" Experience | ✅ Done — unchanged from the original frontend-only build; guest data never touches Supabase |
-| 12 | Data Persistence (real database) | ✅ Done — Supabase Postgres, RLS-protected per user (see `supabase/migrations/`) |
+| #   | Feature                                                                            | Status                                                                                       |
+| --- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | Feed Management (add/edit/remove, validate, favicon, health)                       | ✅ Done                                                                                      |
+| 2   | Feed Parsing (RSS 2.0, Atom, RSS 1.0/RDF, encodings, malformed XML)                | ✅ Done                                                                                      |
+| 3   | Content Browsing (list, favicons, sort, filter, pagination)                        | ✅ Done                                                                                      |
+| 4   | Category Organization (create/rename/delete/reorder, Uncategorized, unread counts) | ✅ Done                                                                                      |
+| 5   | Read/Unread Tracking (manual toggle, mark-all at every scope, persistence)         | ✅ Done                                                                                      |
+| 6   | Article View (reader view, sanitized HTML, next/prev, original link)               | ✅ Done                                                                                      |
+| 7   | Responsive Design (mobile nav drawer, no horizontal scroll)                        | ✅ Done                                                                                      |
+| 8   | Feed Error Handling (temporary vs. dead, backoff, manual retry)                    | ✅ Done                                                                                      |
+| 9   | User Authentication                                                                | ✅ Done — Supabase email/password sign-up, sign-in, sign-out, password reset                 |
+| 10  | Landing Page                                                                       | ✅ Done — hero, feature highlights, dual CTAs (`/`)                                          |
+| 11  | "Try as Guest" Experience                                                          | ✅ Done — unchanged from the original frontend-only build; guest data never touches Supabase |
+| 12  | Data Persistence (real database)                                                   | ✅ Done — Supabase Postgres, RLS-protected per user (see `supabase/migrations/`)             |
 
 ### Design-It-Yourself Features
 
-| Feature | Status |
-|---------|--------|
-| Content Discovery & Onboarding | ✅ Done — see [Design Decisions](#design-decisions) |
-| Layout Customization | ✅ Done — see [Design Decisions](#design-decisions) |
-| Digest / Summary View | ✅ Done — since-last-visit briefing grouped by category (`Digest` nav toggle) — see [Design Decisions](#design-decisions) |
+| Feature                        | Status                                                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Content Discovery & Onboarding | ✅ Done — see [Design Decisions](#design-decisions)                                                                       |
+| Layout Customization           | ✅ Done — see [Design Decisions](#design-decisions)                                                                       |
+| Digest / Summary View          | ✅ Done — since-last-visit briefing grouped by category (`Digest` nav toggle) — see [Design Decisions](#design-decisions) |
 
 ### Stretch Features
 
-| Feature | Status |
-|---------|--------|
-| Bookmarks / Save for Later | ✅ Done — save from any card or the reader, dedicated "Saved" view with sort-by-date-saved/published, count in the sidebar |
-| Search | ✅ Done — client-side, highlights matches, composes with category selection; date-range filter and search history not built (MVP scope — see Known Limitations) |
-| OPML Import/Export | ✅ Done — import with a duplicate-flagged preview and results summary, export preserving category structure; handles `data/sample-feeds.opml`'s edge cases (nested categories, missing `type`, lowercase `xmlurl`/`htmlurl`) |
-| Refresh and Polling | ✅ Done — configurable auto-refresh interval (15/30/60 min or manual), a "last updated" timestamp, and a dismissible "N new items" banner distinct from the existing "since last visit" one; ETag/Last-Modified conditional caching not built (MVP scope — see Known Limitations) |
-| Performance | 🟡 MVP pass — lazy-loaded images (cards and reader content), skeleton loading screens (no layout shift), route-level code-splitting (`Analytics`/`Accessibility`/`Reset Password` are separate chunks); no formal Lighthouse run (see Known Limitations) |
-| Keyboard Navigation | ✅ Done — `j`/`k` to move focus, `o`/`Enter` to open, `s` to save, `m` to toggle read, `/` to search, `?` for a shortcut reference, `Cmd/Ctrl+K` command palette; vim-style `g`-then-key sequences not built (MVP scope — see Known Limitations) |
+| Feature                    | Status                                                                                                                                                                                                                                                                            |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bookmarks / Save for Later | ✅ Done — save from any card or the reader, dedicated "Saved" view with sort-by-date-saved/published, count in the sidebar                                                                                                                                                        |
+| Search                     | ✅ Done — client-side, highlights matches, composes with category selection; date-range filter and search history not built (MVP scope — see Known Limitations)                                                                                                                   |
+| OPML Import/Export         | ✅ Done — import with a duplicate-flagged preview and results summary, export preserving category structure; handles `data/sample-feeds.opml`'s edge cases (nested categories, missing `type`, lowercase `xmlurl`/`htmlurl`)                                                      |
+| Refresh and Polling        | ✅ Done — configurable auto-refresh interval (15/30/60 min or manual), a "last updated" timestamp, and a dismissible "N new items" banner distinct from the existing "since last visit" one; ETag/Last-Modified conditional caching not built (MVP scope — see Known Limitations) |
+| Performance                | 🟡 MVP pass — lazy-loaded images (cards and reader content), skeleton loading screens (no layout shift), route-level code-splitting (`Analytics`/`Accessibility`/`Reset Password` are separate chunks); no formal Lighthouse run (see Known Limitations)                          |
+| Keyboard Navigation        | ✅ Done — `j`/`k` to move focus, `o`/`Enter` to open, `s` to save, `m` to toggle read, `/` to search, `?` for a shortcut reference, `Cmd/Ctrl+K` command palette; vim-style `g`-then-key sequences not built (MVP scope — see Known Limitations)                                  |
 
 ### Differentiators
 
 Two chosen from `spec/differentiators.md` — see [Design Decisions](#design-decisions) for why these two and not the other two (AI Summarization, Offline/PWA).
 
-| Feature | Status |
-|---------|--------|
+| Feature                     | Status                                                                                                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Accessibility-First Reading | ✅ Done — reduced motion, WCAG AAA high contrast, dyslexia-friendly font, adjustable font size/line height/line length, accessibility statement page (`/accessibility`) |
-| Reading Analytics | ✅ Done — signed-in only; total reads, reading streak, 90-day activity heatmap, daily reads chart, top categories/sources (`/analytics`) |
-| AI Summarization | ❌ Not chosen — requires a paid external LLM API key |
-| Offline/PWA Support | ❌ Not chosen — treated as a distinct skill area from the other three, out of scope for this pass |
+| Reading Analytics           | ✅ Done — signed-in only; total reads, reading streak, 90-day activity heatmap, daily reads chart, top categories/sources (`/analytics`)                                |
+| AI Summarization            | ❌ Not chosen — requires a paid external LLM API key                                                                                                                    |
+| Offline/PWA Support         | ❌ Not chosen — treated as a distinct skill area                                                                                                                        |
 
 ---
 
@@ -109,7 +109,7 @@ These are the product and design choices made where the spec left room for inter
 
 **The problem:** The spec's full-stack path asks for real accounts and a real database, but the app already had a complete, working guest experience — the migration shouldn't rewrite that.
 
-**The approach:** Guest mode is untouched: no session means `localStorage`, exactly as before. Signing up adds a database-backed account on top; the dashboard UI itself doesn't change, only *where* its data comes from. Each of the four local hooks (`useUserFeeds`, `useCategories`, `useReadState`, `useLayoutPreference`) has a Supabase-backed counterpart with an identical return shape (`useUserFeedsRemote`, etc.), and `Dashboard.tsx` picks between a `DashboardLocal`/`DashboardRemote` component pair based on auth state — React's rules of hooks don't allow conditionally calling different hooks inside one component, so the choice happens at the component level instead. A fresh account seeds the same curated defaults as guest mode; there's no migration path from an existing guest session's `localStorage` data into a new account.
+**The approach:** Guest mode is untouched: no session means `localStorage`, exactly as before. Signing up adds a database-backed account on top; the dashboard UI itself doesn't change, only _where_ its data comes from. Each of the four local hooks (`useUserFeeds`, `useCategories`, `useReadState`, `useLayoutPreference`) has a Supabase-backed counterpart with an identical return shape (`useUserFeedsRemote`, etc.), and `Dashboard.tsx` picks between a `DashboardLocal`/`DashboardRemote` component pair based on auth state — React's rules of hooks don't allow conditionally calling different hooks inside one component, so the choice happens at the component level instead. A fresh account seeds the same curated defaults as guest mode; there's no migration path from an existing guest session's `localStorage` data into a new account.
 
 **Why Row Level Security is the real security boundary:** The client uses Supabase's public `anon` key, which is meant to be exposed — every table (`categories`, `custom_feeds`, `hidden_feeds`, `feed_title_overrides`, `read_events`, `bookmarks`, `preferences`) has RLS enabled with a `for all using (auth.uid() = user_id) with check (auth.uid() = user_id)` policy, so a user can only ever read or write their own rows regardless of what the client sends.
 
@@ -125,9 +125,9 @@ These are the product and design choices made where the spec left room for inter
 
 ### Reading Analytics (differentiator)
 
-**The approach:** Signed-in only, since it's built on the timestamped `read_events` table (`user_id`, `item_id`, `read_at`, plus `feed_id`/`category_key` added in a follow-up migration for source/category attribution) — guest mode's read state is just a boolean map with no history to chart. The `/analytics` page shows total reads, current/longest streak, a 90-day activity heatmap, a daily-reads chart (7/30/90-day presets), and top-categories/top-sources rankings. Charts are hand-built HTML/CSS (no charting library) following a dataviz methodology: sequential single-hue color (the app's own `--color-accent` token, since none of these charts encode *identity* by color — they're all magnitude comparisons), thin bars with hover/focus tooltips, and a table-view toggle on every chart as the accessibility-equivalent view.
+**The approach:** Signed-in only, since it's built on the timestamped `read_events` table (`user_id`, `item_id`, `read_at`, plus `feed_id`/`category_key` added in a follow-up migration for source/category attribution) — guest mode's read state is just a boolean map with no history to chart. The `/analytics` page shows total reads, current/longest streak, a 90-day activity heatmap, a daily-reads chart (7/30/90-day presets), and top-categories/top-sources rankings. Charts are hand-built HTML/CSS (no charting library) following a dataviz methodology: sequential single-hue color (the app's own `--color-accent` token, since none of these charts encode _identity_ by color — they're all magnitude comparisons), thin bars with hover/focus tooltips, and a table-view toggle on every chart as the accessibility-equivalent view.
 
-**Why category/source attribution needed a follow-up migration:** The original `read_events` table only recorded *that* something was read, not *what it was* — feed items are fetched live from RSS and never stored, so a source/category breakdown needs that context captured at read time, not reconstructed later from data that may no longer be in the live feed window.
+**Why category/source attribution needed a follow-up migration:** The original `read_events` table only recorded _that_ something was read, not _what it was_ — feed items are fetched live from RSS and never stored, so a source/category breakdown needs that context captured at read time, not reconstructed later from data that may no longer be in the live feed window.
 
 ### Bookmarks / Save for Later
 
@@ -231,9 +231,7 @@ npm run preview # preview the production build
 
 ## Self-Assessment, Development Journey & AI Collaboration Reflection
 
-_Left intentionally blank — these are personal, first-person sections (self-ratings, what surprised you, how you worked with AI) that should reflect your own experience, not be filled in on your behalf. See `README-template.md` for the original prompts._
-
----
+## ...
 
 ## Acknowledgments
 
