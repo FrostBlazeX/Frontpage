@@ -7,7 +7,10 @@ type KeyboardShortcutsDialogProps = {
 
 const SHORTCUTS: { keys: string[]; description: string }[] = [
   { keys: ["j", "k"], description: "Move focus down / up the article list" },
-  { keys: ["o", "Enter"], description: "Open the focused article in the reader" },
+  {
+    keys: ["o", "Enter"],
+    description: "Open the focused article in the reader",
+  },
   { keys: ["s"], description: "Save/unsave the focused article" },
   { keys: ["m"], description: "Toggle read/unread on the focused article" },
   { keys: ["/"], description: "Focus search" },
@@ -68,8 +71,13 @@ function KeyboardShortcutsDialog({ onClose }: KeyboardShortcutsDialogProps) {
 
         <ul className="flex flex-col gap-3">
           {SHORTCUTS.map((shortcut) => (
-            <li key={shortcut.description} className="flex items-center justify-between gap-3 text-sm">
-              <span className="text-text-secondary">{shortcut.description}</span>
+            <li
+              key={shortcut.description}
+              className="flex items-center justify-between gap-3 text-sm"
+            >
+              <span className="text-text-secondary">
+                {shortcut.description}
+              </span>
               <span className="flex shrink-0 gap-1">
                 {shortcut.keys.map((key) => (
                   <kbd
