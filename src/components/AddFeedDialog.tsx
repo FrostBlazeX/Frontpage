@@ -8,6 +8,7 @@ import { getFaviconUrl } from "../utils/favicon";
 import AuthorAvatar from "./AuthorAvatar";
 import { parseOpml, buildOpml } from "../utils/opml";
 import type { OpmlFeedEntry } from "../utils/opml";
+import useLockBodyScroll from "../hooks/useLockBodyScroll";
 
 type AddFeedDialogProps = {
   onClose: () => void;
@@ -36,8 +37,10 @@ type ValidationState =
   | { status: "error"; message: string }
   | { status: "valid"; feedTitle: string; feedDescription: string; siteUrl: string };
 
+// text-base (16px) below sm: iOS Safari auto-zooms on focus for any input
+// under 16px, which is what made this dialog appear to "zoom in" on mobile.
 const inputClass =
-  "w-full min-w-0 rounded-md border border-border bg-bg-primary px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+  "w-full min-w-0 rounded-md border border-border bg-bg-primary px-3 py-2 text-base sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
 
 // The parent only mounts this component while the dialog is open (rather
 // than always rendering it with an `isOpen` prop), so a fresh mount already
@@ -61,11 +64,10 @@ function AddFeedDialog({
   const [opmlError, setOpmlError] = useState<string | null>(null);
   const [opmlResult, setOpmlResult] = useState<string | null>(null);
 
+  useLockBodyScroll(true);
+
   useEffect(() => {
     urlInputRef.current?.focus();
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -73,7 +75,6 @@ function AddFeedDialog({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
     // Runs once for this mount's lifetime — onClose is a fresh closure each

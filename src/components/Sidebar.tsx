@@ -5,6 +5,7 @@ import type { BlogFeed, FeedHealth, FeedItem } from "../types/feed";
 import type { UseCategoriesResult } from "../hooks/useCategories";
 import { SAVED_CATEGORY } from "../pages/Homepage";
 import { formatCount } from "../utils/formatCount";
+import useLockBodyScroll from "../hooks/useLockBodyScroll";
 
 // 3+ consecutive failures reads as "likely dead" rather than a transient blip.
 const DEAD_THRESHOLD = 3;
@@ -204,13 +205,12 @@ type MobileNavDrawerProps = SidebarProps & {
 function MobileNavDrawer({ isOpen, onClose, ...contentProps }: MobileNavDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  useLockBodyScroll(isOpen);
+
   useEffect(() => {
     if (!isOpen) return;
 
     closeButtonRef.current?.focus();
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -218,7 +218,6 @@ function MobileNavDrawer({ isOpen, onClose, ...contentProps }: MobileNavDrawerPr
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
@@ -237,7 +236,7 @@ function MobileNavDrawer({ isOpen, onClose, ...contentProps }: MobileNavDrawerPr
         role="dialog"
         aria-modal="true"
         aria-label="Navigation"
-        className="relative flex flex-col w-sidebar max-w-[80vw] h-full border-r border-border bg-bg-secondary px-3 text-text-secondary shadow-lg"
+        className="relative flex flex-col w-sidebar max-w-[80vw] h-full overflow-y-auto overscroll-contain border-r border-border bg-bg-secondary px-3 text-text-secondary shadow-lg"
       >
         <div className="flex items-center justify-end pt-2">
           <button

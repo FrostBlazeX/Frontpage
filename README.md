@@ -69,7 +69,7 @@ Two [differentiators](spec/differentiators.md) are implemented: **Accessibility-
 | Search                     | ✅ Done — client-side, highlights matches, composes with category selection; date-range filter and search history not built (MVP scope — see Known Limitations)                                                                                                                   |
 | OPML Import/Export         | ✅ Done — import with a duplicate-flagged preview and results summary, export preserving category structure; handles `data/sample-feeds.opml`'s edge cases (nested categories, missing `type`, lowercase `xmlurl`/`htmlurl`)                                                      |
 | Refresh and Polling        | ✅ Done — configurable auto-refresh interval (15/30/60 min or manual), a "last updated" timestamp, and a dismissible "N new items" banner distinct from the existing "since last visit" one; ETag/Last-Modified conditional caching not built (MVP scope — see Known Limitations) |
-| Performance                | ✅ Done — lazy-loaded images, skeleton loading screens (no layout shift), route-level code-splitting; Lighthouse 82/83/100/82 (landing) — see [Design Decisions](#design-decisions) for the full scores and the `/app` caveat |
+| Performance                | ✅ Done — lazy-loaded images, skeleton loading screens (no layout shift), route-level code-splitting; Lighthouse 82/83/100/82 (landing) — see [Design Decisions](#design-decisions) for the full scores and the `/app` caveat                                                     |
 | Keyboard Navigation        | ✅ Done — `j`/`k` to move focus, `o`/`Enter` to open, `s` to save, `m` to toggle read, `/` to search, `?` for a shortcut reference, `Cmd/Ctrl+K` command palette; vim-style `g`-then-key sequences not built (MVP scope — see Known Limitations)                                  |
 
 ### Differentiators
@@ -157,14 +157,14 @@ These are the product and design choices made where the spec left room for inter
 
 **Lighthouse scores** (`npx lighthouse`, headless, against a `vite preview` production build):
 
-| Route | Performance | Accessibility | Best Practices | SEO |
-|-------|:-----------:|:--------------:|:---------------:|:---:|
-| `/` (landing) | 82 | 83 | 100 | 82 |
-| `/app` (dashboard, guest) | 59 | 96 | 100 | 82 |
+| Route                     | Performance | Accessibility | Best Practices | SEO |
+| ------------------------- | :---------: | :-----------: | :------------: | :-: |
+| `/` (landing)             |     82      |      83       |      100       | 82  |
+| `/app` (dashboard, guest) |     59      |      96       |      100       | 82  |
 
 Landing page: FCP/LCP 2.5s, TBT 470ms, CLS 0, TTI 3.0s — under the spec's 3s initial-load target but over its 2s landing-page-TTI target.
 
-**Why `/app`'s performance score is lower, and why it's not fully representative:** `vite preview` serves the built static files only — it doesn't run the dev-only middleware that mirrors `/api/*` locally (see Tech Stack), so under this specific test the dashboard's feed requests 404 and the page never reaches its real steady state. The 59 is a real number for *this* test setup, not a claim about production performance under Vercel (where `/api/*` runs for real); it's reported here rather than omitted because a caveated real number is more honest than no number at all.
+**Why `/app`'s performance score is lower, and why it's not fully representative:** `vite preview` serves the built static files only — it doesn't run the dev-only middleware that mirrors `/api/*` locally (see Tech Stack), so under this specific test the dashboard's feed requests 404 and the page never reaches its real steady state. The 59 is a real number for _this_ test setup, not a claim about production performance under Vercel (where `/api/*` runs for real); it's reported here rather than omitted because a caveated real number is more honest than no number at all.
 
 ### Keyboard Navigation
 
@@ -239,6 +239,12 @@ npm run preview # preview the production build
 ---
 
 ## Self-Assessment, Development Journey & AI Collaboration Reflection
+
+1. Sidebar scroll on mobile — Sidebar.tsx was locking scroll with document.body.style.overflow = "hidden", which iOS Safari partially ignores for touch. Added useLockBodyScroll.ts, which pins the body with position: fixed (removing it from the scrollable flow) and restores the exact scroll position on close. Also gave the drawer panel its own overflow-y-auto overscroll-contain so long content scrolls internally without leaking to the page.
+
+2. Add Feed modal "zooming in" — not actually a zoom bug in your code, it's iOS Safari auto-zooming any input under 16px font-size on focus. AddFeedDialog.tsx inputs were text-sm (13px), and the URL field auto-focuses the instant the dialog opens, so it fired immediately with no reset — hence the double-tap-to-recover. Changed the input class to text-base sm:text-sm (16px on mobile, unchanged 13px at sm: and up), and reused the new scroll-lock hook here too.
+
+3. Password visibility toggle — added PasswordInput.tsx, a small wrapper with an eye/eye-off button (lucide icons, proper aria-label/aria-pressed) that toggles between type="password" and type="text". Wired into both SignInPage.tsx and SignUpPage.tsx.
 
 ## ...
 

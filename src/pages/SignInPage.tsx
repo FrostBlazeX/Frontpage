@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import PasswordInput from "../components/PasswordInput";
 
 const inputClass =
   "w-full rounded-md border border-border bg-bg-primary px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
@@ -60,14 +61,13 @@ function SignInPage() {
             >
               Password
             </label>
-            <input
+            <PasswordInput
               id="signin-password"
-              type="password"
               required
               autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className={inputClass}
+              inputClassName={inputClass}
             />
           </div>
 
