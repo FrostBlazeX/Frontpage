@@ -1,4 +1,4 @@
-import { fetchAndParseFeed, isFetchableFeedUrl } from "./_lib/fetchFeed";
+import { fetchAndParseFeed, isFetchableFeedUrl } from "./_lib/fetchFeed.js";
 
 export interface MinimalApiRequest {
   query: Record<string, string | string[] | undefined>;
