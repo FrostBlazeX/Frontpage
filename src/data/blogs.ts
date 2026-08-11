@@ -21,38 +21,6 @@ export const BLOG_FEEDS: BlogFeed[] = [
     category: "Frontend",
     color: "#E8524A",
   },
-  {
-    id: "josh-comeau",
-    name: "Josh W. Comeau",
-    url: "https://www.joshwcomeau.com/rss.xml",
-    siteUrl: "https://www.joshwcomeau.com/",
-    category: "Frontend",
-    color: "#B8860B",
-  },
-  {
-    id: "kent-c-dodds",
-    name: "Kent C. Dodds",
-    url: "https://kentcdodds.com/blog/rss.xml",
-    siteUrl: "https://kentcdodds.com/",
-    category: "Frontend",
-    color: "#4338CA",
-  },
-  {
-    id: "web-dev",
-    name: "web.dev",
-    url: "https://web.dev/feed.xml",
-    siteUrl: "https://web.dev/",
-    category: "Frontend",
-    color: "#1A73E8",
-  },
-  {
-    id: "mdn",
-    name: "MDN Blog",
-    url: "https://developer.mozilla.org/en-US/blog/rss.xml",
-    siteUrl: "https://developer.mozilla.org/en-US/blog/",
-    category: "Frontend",
-    color: "#6B46C1",
-  },
 
   // Design
   {
@@ -71,22 +39,7 @@ export const BLOG_FEEDS: BlogFeed[] = [
     category: "Design",
     color: "#C2410C",
   },
-  {
-    id: "figma",
-    name: "Figma Blog",
-    url: "https://www.figma.com/blog/feed/",
-    siteUrl: "https://www.figma.com/blog/",
-    category: "Design",
-    color: "#7C3AED",
-  },
-  {
-    id: "alistapart",
-    name: "A List Apart",
-    url: "https://alistapart.com/main/feed/",
-    siteUrl: "https://alistapart.com/",
-    category: "Design",
-    color: "#B03A1F",
-  },
+
   {
     id: "ux-collective",
     name: "UX Collective",
@@ -120,14 +73,6 @@ export const BLOG_FEEDS: BlogFeed[] = [
     siteUrl: "https://github.blog/",
     category: "Backend & DevOps",
     color: "#24292F",
-  },
-  {
-    id: "netlify",
-    name: "Netlify Blog",
-    url: "https://www.netlify.com/blog/index.xml",
-    siteUrl: "https://www.netlify.com/blog/",
-    category: "Backend & DevOps",
-    color: "#058E82",
   },
 
   // General Tech
